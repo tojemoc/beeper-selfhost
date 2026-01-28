@@ -133,6 +133,33 @@ export async function POST(req: Request) {
     if (!secrets_request_data?.setSecrets?.hasOwnProperty('release')) {
         return NextResponse.json({ error: JSON.stringify(secrets_request_data) }, { status: 500 })
     }
+    const res_create_volume = await fetch(
+        `https://api.machines.dev/v1/apps/${app_name}/volumes`,
+        {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${flyToken}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name: "bridge_data",
+                region: region,
+                size_gb: 1
+            })
+        }
+    )
+
+    if (res_create_volume.status !== 201) {
+        const volume_data = await res_create_volume.json()
+        return NextResponse.json(
+            { error: JSON.stringify(volume_data) },
+            { status: 500 }
+        )
+    }
+    const volume = await res_create_volume.json()
+    const volumeId = volume.id
+
+    await new Promise((r) => setTimeout(r, 500))
 
     // Create machine
     const res_create_machine = await fetch(`https://api.machines.dev/v1/apps/${app_name}/machines`, {
@@ -148,6 +175,12 @@ export async function POST(req: Request) {
                 "env": {
                     "APP_ENV": "production"
                 },
+                "mounts": [
+                    {
+                        volume: volumeId,
+                        path: "/data"
+                    }
+                ],
                 "services": [
                     {
                         "ports": [

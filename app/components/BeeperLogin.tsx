@@ -89,6 +89,12 @@ export default function BeeperLogin({ setBeeperToken }: any) {
                             inputMode="numeric"
                             placeholder="123 456"
                         />
+                        <button
+                            className="p-2 mt-4 rounded-md w-full bg-purple-600 border-0 text-white hover:bg-purple-500"
+                            type="submit"
+                        >
+                            Login
+                        </button>
                     </form>
                 </div>
             ) : (
@@ -100,6 +106,12 @@ export default function BeeperLogin({ setBeeperToken }: any) {
                             name="email"
                             type="email"
                         />
+                        <button
+                            className="p-2 mt-4 rounded-md w-full bg-purple-600 border-0 text-white hover:bg-purple-500"
+                            type="submit"
+                        >
+                            Send Login Code
+                        </button>
                     </form>
                 </div>
             )}

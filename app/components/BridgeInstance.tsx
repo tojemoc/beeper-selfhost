@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function BridgeInstance({ name, onFly, beeperToken, flyToken, onDelete }: any) {
+export default function BridgeInstance({ name, onFly, beeperToken, flyToken, onDelete, onRedeploy }: any) {
 
     const [deleteInProgress, setDeleteInProgress] = useState(false)
     const [errorMessage, setErrorMessage] = useState("")
@@ -45,6 +45,7 @@ export default function BridgeInstance({ name, onFly, beeperToken, flyToken, onD
         }
 
         setRedeploying(false)
+        onRedeploy()
     }
 
     return (

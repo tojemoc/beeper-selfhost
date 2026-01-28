@@ -19,6 +19,12 @@ export default function FlyLogin({setFlyToken}: any) {
                 <p>Your fly.io org deploy token:</p>
                 <form onSubmit={handleSubmit}>
                     <input className="p-2 border-2 rounded-md w-full" type={"password"} />
+                        <button
+                            className="p-2 mt-4 rounded-md w-full bg-purple-600 border-0 text-white hover:bg-purple-500"
+                            type="submit"
+                        >
+                            Login to Fly.io
+                        </button>
                 </form>
             </div>
         </div>

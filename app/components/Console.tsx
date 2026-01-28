@@ -7,6 +7,7 @@ export default function Console({ beeperToken, flyToken }: any) {
     const [bridges, setBridges] = useState<any>([])
     const [bridgeDeleted, setBridgeDeleted] = useState(false);
     const [bridgeCreated, setBridgeCreated] = useState(false);
+    const [bridgeRedeployed, setBridgeRedeployed] = useState(false)
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -20,6 +21,9 @@ export default function Console({ beeperToken, flyToken }: any) {
     }
     function handleBridgeCreate() {
         setBridgeCreated(!bridgeCreated);
+    }
+    function handleBridgeRedeploy() {
+        setBridgeRedeployed(!bridgeRedeployed);
     }
 
     useEffect(() => {
@@ -66,11 +70,12 @@ export default function Console({ beeperToken, flyToken }: any) {
                                     <th className="border py-2 px-8">Bridge Bot ID</th>
                                     <th className="border py-2 px-8">Console</th>
                                     <th className="border py-2 px-8">Delete</th>
+                                    <th className="border py-2 px-8">Redeploy</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 { bridges.map((bridge: {id: string, onFly: string}) => (
-                                    <BridgeInstance key={bridge.id} name={bridge.id} onFly={bridge.onFly} beeperToken={beeperToken} flyToken={flyToken} onDelete={handleBridgeDelete} />
+                                    <BridgeInstance key={bridge.id} name={bridge.id} onFly={bridge.onFly} beeperToken={beeperToken} flyToken={flyToken} onDelete={handleBridgeDelete} onRedeploy={handleBridgeRedeploy} />
                                 )) }
                                 </tbody>
                             </table>
