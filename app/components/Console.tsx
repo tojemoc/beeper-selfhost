@@ -11,9 +11,21 @@ export default function Console({ beeperToken, flyToken }: any) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    function signOut() {
-        window.localStorage.clear()
-        location.reload();
+    async function signOut() {
+        try {
+            await fetch("/api/beeper/logout", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ beeperToken }),
+            });
+        } catch (error) {
+            console.error("Failed to logout from Beeper API:", error);
+        } finally {
+            window.localStorage.clear()
+            location.reload();
+        }
     }
 
     function handleBridgeDelete() {
