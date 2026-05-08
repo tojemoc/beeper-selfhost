@@ -1829,9 +1829,9 @@ hasown@^2.0.2:
     function-bind "^1.1.2"
 
 hono@^4.11.4:
-  version "4.12.15"
-  resolved "https://registry.yarnpkg.com/hono/-/hono-4.12.15.tgz#50302aae9a2b8ae6e5a1bab62e722f2259f9d0fb"
-  integrity sha512-qM0jDhFEaCBb4TxoW7f53Qrpv9RBiayUHo0S52JudprkhvpjIrGoU1mnnr29Fvd1U335ZFPZQY1wlkqgfGXyLg==
+  version "4.12.18"
+  resolved "https://registry.yarnpkg.com/hono/-/hono-4.12.18.tgz#f6d301938868c3a8bdb639495f4e326a19181505"
+  integrity sha512-RWzP96k/yv0PQfyXnWjs6zot20TqfpfsNXhOnev8d1InAxubW93L11/oNUc3tQqn2G0bSdAOBpX+2uDFHV7kdQ==
 
 http-errors@^2.0.0, http-errors@^2.0.1, http-errors@~2.0.1:
   version "2.0.1"
@@ -2639,10 +2639,10 @@ postcss@8.4.31:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-postcss@8.5.10, postcss@^8.4.23:
-  version "8.5.10"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.5.10.tgz#8992d8c30acf3f12169e7c09514a12fed7e48356"
-  integrity sha512-pMMHxBOZKFU6HgAZ4eyGnwXF/EvPGGqUr0MnZ5+99485wwW41kW91A4LOGxSHhgugZmSChL5AlElNdwlNgcnLQ==
+postcss@8.5.11, postcss@^8.4.23:
+  version "8.5.11"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.5.11.tgz#42ed344ff95c002a76f73678416adabecc8607dd"
+  integrity sha512-5dDj8+lmvA8XB78SmzGI8NlQoksv7IfutGWeVZxiixHbO+p4LDPT3wuG/D9sM/wrjZZ9I+Siy/e117vbFPxSZg==
   dependencies:
     nanoid "^3.3.11"
     picocolors "^1.1.1"
