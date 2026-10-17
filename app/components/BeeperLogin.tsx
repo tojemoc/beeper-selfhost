@@ -102,6 +102,7 @@ export default function BeeperLogin({ setBeeperToken }: any) {
                             type="text"
                             inputMode="numeric"
                             placeholder="123 456"
+                            autoComplete="one-time-code"
                             required
                         />
                         <button
