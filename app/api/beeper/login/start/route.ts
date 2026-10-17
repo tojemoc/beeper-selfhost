@@ -14,12 +14,19 @@ export async function POST() {
         body: "{}",
     });
 
-    const data = await response.json();
+    const data = await response.json().catch(() => null);
 
     if (!response.ok) {
         return NextResponse.json(
-            { error: data.error ?? "Failed to start login" },
+            { error: data?.error ?? "Failed to start login" },
             { status: response.status }
+        );
+    }
+
+    if (!data?.request) {
+        return NextResponse.json(
+            { error: "Failed to start login" },
+            { status: 502 }
         );
     }
 

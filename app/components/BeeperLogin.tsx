@@ -116,6 +116,7 @@ export default function BeeperLogin({ setBeeperToken }: any) {
                     {error && <p className="mt-3 text-red-600 text-sm">{error}</p>}
                     <button
                         className="mt-3 text-sm text-gray-500 underline"
+                        disabled={loading}
                         onClick={() => { setStep("email"); setError(""); }}
                     >
                         Use a different email

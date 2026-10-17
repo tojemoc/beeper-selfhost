@@ -4,7 +4,7 @@ const BEEPER_UA = "bbctl/v0.15.0 mautrix-go/0.22.0 Go/1.25.0";
 const BEEPER_AUTH = "Bearer BEEPER-PRIVATE-API-PLEASE-DONT-USE";
 
 export async function POST(req: Request) {
-    const { requestId, email } = await req.json();
+    const { requestId, email } = (await req.json().catch(() => null)) ?? {};
 
     if (!requestId || !email) {
         return NextResponse.json(

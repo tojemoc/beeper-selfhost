@@ -4,7 +4,9 @@ const BEEPER_UA = "bbctl/v0.15.0 mautrix-go/0.22.0 Go/1.25.0";
 const BEEPER_AUTH = "Bearer BEEPER-PRIVATE-API-PLEASE-DONT-USE";
 
 export async function POST(req: Request) {
-    const { requestId, code } = await req.json();
+    const body = await req.json().catch(() => null);
+    const requestId = typeof body?.requestId === "string" ? body.requestId.trim() : "";
+    const code = typeof body?.code === "string" ? body.code.replace(/\s+/g, "") : "";
 
     if (!requestId || !code) {
         return NextResponse.json(
@@ -23,13 +25,16 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
             request: requestId,
-            response: code.replace(/\s+/g, ""),
+            response: code,
             appType: "bbctl",
             onlyExistingAccounts: true,
         }),
     });
 
-    const codeData = await codeResponse.json();
+    const codeData = await codeResponse.json().catch((error) => {
+        if (codeResponse.ok) throw error;
+        return {};
+    });
 
     if (!codeResponse.ok) {
         const retries = codeData.retries;
@@ -57,7 +62,10 @@ export async function POST(req: Request) {
         }
     );
 
-    const matrixData = await matrixResponse.json();
+    const matrixData = await matrixResponse.json().catch((error) => {
+        if (matrixResponse.ok) throw error;
+        return {};
+    });
 
     if (!matrixResponse.ok) {
         return NextResponse.json(
