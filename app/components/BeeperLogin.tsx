@@ -1,103 +1,78 @@
 import { useState } from "react";
 
 export default function BeeperLogin({ setBeeperToken }: any) {
-    const [sentCode, setSentCode] = useState(false);
-    const [loginIdentifier, setLoginIdentifier] = useState("");
+    const [step, setStep] = useState<"email" | "code">("email");
+    const [requestId, setRequestId] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     async function sendLoginEmail(event: any) {
         event.preventDefault();
+        setLoading(true);
+        setError("");
 
         const email = event.target[0].value;
 
-        const loginResponse = await fetch("https://api.beeper.com/user/login", {
-            method: "POST",
-            headers: {
-                Authorization: "Bearer BEEPER-PRIVATE-API-PLEASE-DONT-USE",
-            },
-        });
-        const { request } = await loginResponse.json();
+        try {
+            // Start login session
+            const startRes = await fetch("/api/beeper/login/start", {
+                method: "POST",
+            });
+            const startData = await startRes.json();
+            if (!startRes.ok) throw new Error(startData.error);
 
-        await fetch("https://api.beeper.com/user/login/email", {
-            method: "POST",
-            headers: {
-                Authorization: "Bearer BEEPER-PRIVATE-API-PLEASE-DONT-USE",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ request, email }),
-        });
+            // Send email code
+            const emailRes = await fetch("/api/beeper/login/email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ requestId: startData.requestId, email }),
+            });
+            const emailData = await emailRes.json();
+            if (!emailRes.ok) throw new Error(emailData.error);
 
-        setSentCode(true);
-        setLoginIdentifier(request);
+            setRequestId(startData.requestId);
+            setStep("code");
+        } catch (e: any) {
+            setError(e.message ?? "Something went wrong");
+        } finally {
+            setLoading(false);
+        }
     }
 
-    async function getToken(event: any) {
+    async function verifyCode(event: any) {
         event.preventDefault();
+        setLoading(true);
+        setError("");
 
-        let code = event.target[0].value;
-        code = code.replace(/\s+/g, ""); // strip all whitespace
+        const code = event.target[0].value;
 
-        const loginChallengeResponse = await fetch(
-            "https://api.beeper.com/user/login/response",
-            {
+        try {
+            const res = await fetch("/api/beeper/login/verify", {
                 method: "POST",
-                headers: {
-                    Authorization: "Bearer BEEPER-PRIVATE-API-PLEASE-DONT-USE",
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ request: loginIdentifier, response: code }),
-            }
-        );
-        const { token } = await loginChallengeResponse.json();
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ requestId, code }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
 
-        const accessTokenResponse = await fetch(
-            "https://matrix.beeper.com/_matrix/client/v3/login",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    type: "org.matrix.login.jwt",
-                    initial_device_display_name: "Beeper Bridge Self-Host",
-                    token: token
-                })
-            }
-        );
-
-        const { access_token } = await accessTokenResponse.json();
-
-        setBeeperToken(access_token);
-        window.localStorage.setItem("beeperToken", access_token);
+            setBeeperToken(data.token);
+            window.localStorage.setItem("beeperToken", data.token);
+        } catch (e: any) {
+            setError(e.message ?? "Something went wrong");
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
         <div className="m-20">
             <p className="text-center text-4xl font-bold">Sign in to Beeper</p>
             <p className="text-center mt-5">
-                This will be used to connect your self-hosted bridge to your Beeper account. Your credentials will be passed directly to Fly.
+                This will be used to connect your self-hosted bridge to your Beeper
+                account. Your credentials are passed directly to Fly.
             </p>
 
-            {sentCode ? (
-                <div className="mx-auto w-72 mt-16">
-                    <p>{"We've emailed you a login code."}</p>
-                    <form className="mt-2" onSubmit={getToken}>
-                        <p>Enter it here:</p>
-                        <input
-                            className="p-2 border-2 rounded-md w-full"
-                            name="code"
-                            type="text"
-                            inputMode="numeric"
-                            placeholder="123 456"
-                        />
-                        <button
-                            className="p-2 mt-4 rounded-md w-full bg-purple-600 border-0 text-white hover:bg-purple-500"
-                            type="submit"
-                        >
-                            Login
-                        </button>
-                    </form>
-                </div>
-            ) : (
+            {step === "email" ? (
                 <div className="mx-auto w-72 mt-16">
                     <form onSubmit={sendLoginEmail}>
                         <p>Email:</p>
@@ -105,14 +80,47 @@ export default function BeeperLogin({ setBeeperToken }: any) {
                             className="p-2 border-2 rounded-md w-full"
                             name="email"
                             type="email"
+                            required
                         />
                         <button
-                            className="p-2 mt-4 rounded-md w-full bg-purple-600 border-0 text-white hover:bg-purple-500"
+                            className="p-2 mt-4 rounded-md w-full bg-purple-600 border-0 text-white hover:bg-purple-500 disabled:bg-purple-300"
                             type="submit"
+                            disabled={loading}
                         >
-                            Send Login Code
+                            {loading ? "Sending..." : "Send Login Code"}
                         </button>
                     </form>
+                    {error && <p className="mt-3 text-red-600 text-sm">{error}</p>}
+                </div>
+            ) : (
+                <div className="mx-auto w-72 mt-16">
+                    <form onSubmit={verifyCode}>
+                        <p>{"We've emailed you a login code. Enter it here:"}</p>
+                        <input
+                            className="p-2 mt-2 border-2 rounded-md w-full"
+                            name="code"
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="123 456"
+                            autoComplete="one-time-code"
+                            required
+                        />
+                        <button
+                            className="p-2 mt-4 rounded-md w-full bg-purple-600 border-0 text-white hover:bg-purple-500 disabled:bg-purple-300"
+                            type="submit"
+                            disabled={loading}
+                        >
+                            {loading ? "Verifying..." : "Login"}
+                        </button>
+                    </form>
+                    {error && <p className="mt-3 text-red-600 text-sm">{error}</p>}
+                    <button
+                        className="mt-3 text-sm text-gray-500 underline"
+                        disabled={loading}
+                        onClick={() => { setStep("email"); setError(""); }}
+                    >
+                        Use a different email
+                    </button>
                 </div>
             )}
         </div>
